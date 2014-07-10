@@ -89,12 +89,20 @@ var _ = {};
   _.filter = function(collection, test) {
       var passed = [];
 
-      for (var i=0; i < collection.length; i++) {
-          console.log(test(collection[i]));
-          if (test(collection[i])) {
-              passed.push(collection[i]);
+//    for (var i=0; i < collection.length; i++) {
+//        console.log(test(collection[i]));
+//        if (test(collection[i])) {
+//            passed.push(collection[i]);
+//        }
+//    }
+
+      _.each(collection, function(item, index){
+          if (test(collection[index])) {
+              passed.push(collection[index]);
           }
-      }
+
+      });
+
       return passed;
   };
 
@@ -102,10 +110,29 @@ var _ = {};
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+
+      var rejected = [];
+
+      _.each(collection, function(item,index) {
+          if (!test(collection[index])) {
+              rejected.push(collection[index]);
+          }
+      })
+
+      return rejected;
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+      var only = [];
+      var obj = {};
+      for (var i = 0; i < array.length; i++) {
+          obj[array[i]] = 0;
+      }
+      for ( i in obj ) {
+          only.push(i);
+      }
+      return only;
   };
 
 
@@ -114,6 +141,11 @@ var _ = {};
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var newArray = [];
+    for (var i = 0; i < collection.length; i++) {
+        newArray.push(iterator(collection[i]));
+    }
+    return newArray;
   };
 
   /*
