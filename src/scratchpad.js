@@ -3,7 +3,7 @@
  */
 
 // EACH:
-//var animals = ['ant', 'bat', 'cat'];
+var animals = ['ant', 'bat', 'cat'];
 //var iterationInputs = [];
 //
 //animals.shouldBeIgnored = 'Ignore me!';
@@ -162,10 +162,140 @@ var doseMe = map([1,2,3,4,5,6,7,8,9], function(num) {
 // invoke
 
 function invoke(collection, functionOrKey, args) {
-    functionOrKey.apply(collection, args);
+    var result = [];
+
+        for (var i = 0; i < collection.length; i++) {
+            if (String.prototype.hasOwnProperty(functionOrKey)) {
+//                var stringerBell = collection[i]+"."+functionOrKey+"()";
+//                console.log(collection[i]+"."+functionOrKey+"()")
+//                result.push(stringerBell);
+                result.push(String.prototype.functionOrKey.apply(collection[i], args));
+            } else {
+                result.push(functionOrKey.apply(collection[i], args));
+            }
+        }
+    return result;
 }
 
 var reverse = function(){
     return this.split('').reverse().join('');
 };
-console.log(reverse('frog'));
+//console.log(invoke(animals,reverse));
+//console.log(invoke(animals,'toUpperCase'));
+
+// REDUCE
+function reduce(collection, iterator, accumulator) {
+    var current;
+    var start = accumulator;
+    if (Array.isArray(collection)) {
+        if (start !== undefined) {
+            current = start;
+        } else {
+            current = collection[0];
+        }
+        for (var i = 0; i<collection.length; i++) {
+            current = iterator(current, collection[i]);
+        }
+    } else {
+        if (start !== undefined) {
+            current = start;
+        } else {
+            current = collection[Object.keys(collection)[0]];
+        }
+        for (var i in collection) {
+            current = iterator(current, collection[i]);
+        }
+    }
+    return current;
+};
+
+//var add = function(tally, item) {
+// return tally + item;
+// };
+//var totalA = reduce([1, 2, 3], add, 0);
+//var totalB = reduce([1, 2, 3], add);
+//
+//console.log(totalA);
+//console.log(totalB);
+
+
+// Contains
+function contains(collection, target) {
+    // TIP: Many iteration problems can be most easily expressed in
+    // terms of reduce(). Here's a freebie to demonstrate!
+    return _.reduce(collection, function(wasFound, item) {
+        if (wasFound) {
+            return true;
+        }
+        return item === target;
+    }, false);
+}
+
+// Every
+function identity(val) {
+    return val;
+};
+
+every = function(collection, iterator) {
+    // TIP: Try re-using reduce() here.
+    var result = true;
+    for (var i = 0; i < collection.length; i++) {
+        if ( iterator !== undefined ) {
+            if (iterator(collection[i])) {
+                result = true;
+            } else {
+                return false;
+            };
+        }
+        else {
+            if (collection[i]) {
+                result = true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    return result;
+};
+
+// Some
+function some(collection, iterator) {
+    // TIP: There's a very clever way to re-use every() here.
+    if ( iterator == undefined ) {
+        iterator = identity;
+    }
+    var result = false;
+    if (collection == null) return result;
+    for (var i = 0; i < collection.length; i++) {
+        if (iterator(collection[i])) {
+            return true;
+        }
+    }
+    return result;
+};
+
+//console.log(some([]));
+
+// Extend
+
+function extend(obj) {
+    var result = obj;
+    for (var i = 1; i < arguments.length; i++) {
+        console.log(arguments[i])
+//        keys.push(Object.getOwnPropertyNames(arguments[i]));
+//        console.log("The keys are " + keys);
+//        for (var i = 0; i < keys.length; i++) {
+//            result[keys[i]] = arguments[i][keys[i]];
+//        }
+    }
+    return result;
+};
+
+var to = {};
+var from = {a:'b', y:'z'};
+from['m'] = 'n';
+var extended = extend({x:1}, {a:2}, {b:3});
+
+console.log(extended);
+
