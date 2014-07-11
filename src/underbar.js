@@ -1,5 +1,7 @@
 /*jshint eqnull:true, expr:true*/
 
+// this is a comment
+
 var _ = {};
 
 (function() {
