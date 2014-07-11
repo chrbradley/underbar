@@ -158,9 +158,6 @@ var _ = {};
   // a certain property in it. E.g. take an array of people and return
   // an array of just their ages
   _.pluck = function(collection, key) {
-    // TIP: map is really handy when you want to transform an array of
-    // values into a new array of values. _.pluck() is solved for you
-    // as an example of this.
     return _.map(collection, function(item){
       return item[key];
     });
@@ -169,18 +166,16 @@ var _ = {};
   // Calls the method named by methodName on each value in the list.
   // Note: you will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
-      var result = [];
-
-      if (Array.isArray(collection)) {
-          for (var i = 0; i < collection.length; i++) {
-              result.push(functionOrKey.apply(collection[i], args));
-          }
+      var mints = Array.prototype.slice(arguments,2);
+      if (String.prototype.hasOwnProperty(functionOrKey)) {
+          return _.map(collection, function (value) {
+              return value[functionOrKey].apply(value, mints);
+          })
       } else {
-          for (var i in collection) {
-              result.push(functionOrKey.apply(collection[i],args));
-          }
+          return _.map(collection, function (value) {
+              return functionOrKey.apply(value, mints);
+          })
       }
-      return result;
   };
 
   // Reduces an array or object to a single value by repetitively calling
@@ -291,13 +286,10 @@ var _ = {};
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
       var result = obj;
-      console.log("result has been assigned: "+result);
-      console.log("The second argument is "+ arguments[1]);
-      var keys = Object.getOwnPropertyNames(arguments[1]);
-      console.log("The keys are "+ keys);
-      for (var i = 0; i < keys.length; i++) {
-//        console.log(arguments[1][keys[i]]);
-          result[keys[i]] = arguments[1][keys[i]];
+      for (var i = 1; i < arguments.length; i++) {
+          for (var j in arguments[i]) {
+              result[j] = arguments[i][j];
+          }
       }
       return result;
   };
@@ -305,7 +297,15 @@ var _ = {};
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
-
+      var result = obj;
+      for (var i = 1; i < arguments.length; i++) {
+          for (var j in arguments[i]) {
+              if (!result.hasOwnProperty(j)) {
+                  result[j] = arguments[i][j];
+              }
+          }
+      }
+      return result;
   };
 
 
@@ -331,7 +331,7 @@ var _ = {};
     return function() {
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
-        // infromation from one function call to another.
+        // information from one function call to another.
         result = func.apply(this, arguments);
         alreadyCalled = true;
       }
@@ -347,6 +347,19 @@ var _ = {};
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+      var memo = {};
+      var slice = Array.prototype.slice;
+
+      return function() {
+          var args = slice.call(arguments);
+
+          if (args in memo) {
+              return memo[args];
+          }
+          else {
+              return (memo[args] = func.apply(this, args));
+          }
+      }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -356,6 +369,13 @@ var _ = {};
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+      var args = [];
+      for (var i = 2; i < arguments.length; i++) {
+          args.push(arguments[i]);
+      }
+      return setTimeout(function(){
+          return func.apply(null, args);
+      }, wait);
   };
 
 
@@ -370,6 +390,16 @@ var _ = {};
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+      var result = array.slice(0), a, b;
+
+      for (var i = 0; i < result.length; i++) {
+          a = Math.floor(Math.random(0)*array.length);
+          b = Math.floor(Math.random(0)*array.length);
+          var x = result[a];
+          result[a] = result[b];
+          result[b] = x;
+      }
+      return result;
   };
 
 

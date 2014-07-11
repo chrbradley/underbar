@@ -162,26 +162,38 @@ var doseMe = map([1,2,3,4,5,6,7,8,9], function(num) {
 // invoke
 
 function invoke(collection, functionOrKey, args) {
-    var result = [];
+//    var result = [];
+    var mints = Array.prototype.slice(arguments,2);
+    console.log(typeof functionOrKey);
+    console.log(typeof functionOrKey === 'function');
+    if (String.prototype.hasOwnProperty(functionOrKey)) {
+        return map(collection, function (value) {
+            return value[functionOrKey].apply(value, mints);
+        })
+    } else {
+        return map(collection, function (value) {
+            return functionOrKey.apply(value, mints);
+        })
+    }
 
-        for (var i = 0; i < collection.length; i++) {
-            if (String.prototype.hasOwnProperty(functionOrKey)) {
-//                var stringerBell = collection[i]+"."+functionOrKey+"()";
-//                console.log(collection[i]+"."+functionOrKey+"()")
-//                result.push(stringerBell);
-                result.push(String.prototype.functionOrKey.apply(collection[i], args));
-            } else {
-                result.push(functionOrKey.apply(collection[i], args));
-            }
-        }
-    return result;
+//        for (var i = 0; i < collection.length; i++) {
+//            if (String.prototype.hasOwnProperty(functionOrKey)) {
+////                var stringerBell = collection[i]+"."+functionOrKey+"()";
+////                console.log(collection[i]+"."+functionOrKey+"()")
+////                result.push(stringerBell);
+//                result.push(String.prototype.functionOrKey.apply(collection[i], args));
+//            } else {
+//                result.push(functionOrKey.apply(collection[i], args));
+//            }
+//        }
+//    return result;
 }
 
 var reverse = function(){
     return this.split('').reverse().join('');
 };
-//console.log(invoke(animals,reverse));
-//console.log(invoke(animals,'toUpperCase'));
+console.log(invoke(animals,reverse));
+console.log(invoke(animals,'toUpperCase'));
 
 // REDUCE
 function reduce(collection, iterator, accumulator) {
@@ -282,20 +294,101 @@ function some(collection, iterator) {
 function extend(obj) {
     var result = obj;
     for (var i = 1; i < arguments.length; i++) {
-        console.log(arguments[i])
-//        keys.push(Object.getOwnPropertyNames(arguments[i]));
-//        console.log("The keys are " + keys);
-//        for (var i = 0; i < keys.length; i++) {
-//            result[keys[i]] = arguments[i][keys[i]];
-//        }
+        for (var j in arguments[i]) {
+            result[j] = arguments[i][j];
+        }
     }
     return result;
 };
 
 var to = {};
 var from = {a:'b', y:'z'};
+var end = {};
 from['m'] = 'n';
-var extended = extend({x:1}, {a:2}, {b:3});
+var extended = extend(to, end, from);
 
-console.log(extended);
+//console.log(extended);
 
+// Defaults
+function defaults(obj) {
+    var result = obj;
+    for (var i = 1; i < arguments.length; i++) {
+        for (var j in arguments[i]) {
+            if (!result.hasOwnProperty(j)) {
+                result[j] = arguments[i][j];
+            }
+        }
+    }
+    return result;
+};
+
+// Memoize
+function memoize(func) {
+    var memo = {};
+    var slice = Array.prototype.slice;
+
+    return function() {
+        var args = slice.call(arguments);
+        console.log(args);
+
+        if (args in memo) {
+            return memo[args];
+        }
+        else {
+            return (memo[args] = func.apply(this, args));
+        }
+    }
+};
+
+var fib, fastFib, timeCheck, fastTime, wait;
+
+
+    fib = function(n) {
+        if(n < 2){ return n; }
+        return fib(n - 1) + fib(n - 2);
+    };
+    fastFib = memoize(fib);
+
+    timeCheck = function(str) { return str + Date.now(); };
+    fastTime = memoize(timeCheck);
+
+    // Synchronous sleep: terrible for web development, awesome for testing _.memoize
+    wait = function(t) {
+        var start = Date.now();
+        while ((Date.now() - start) < t){}
+    };
+
+
+//console.log(fastFib(10));
+
+// Delay
+function delay(func, wait){
+    var args = [];
+    for (var i = 2; i < arguments.length; i++) {
+        args.push(arguments[i]);
+    }
+    return setTimeout(function(){
+        return func.apply(null, args);
+    }, wait);
+};
+
+// shuffled
+
+function shuffle(array) {
+    var result = array.slice(0), a, b;
+
+    for (var i = 0; i < result.length; i++) {
+        a = Math.floor(Math.random(0)*array.length);
+        b = Math.floor(Math.random(0)*array.length);
+        var x = result[a];
+        result[a] = result[b];
+        result[b] = x;
+    }
+    return result;
+};
+
+var digis = [1,2,3,4,5,6,7];
+
+//console.log(digis);
+//console.log(shuffle(digis));
+//console.log(digis);

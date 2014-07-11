@@ -194,9 +194,9 @@ describe('invoke, when provided a function reference', function() {
       return this.split('').reverse().join('');
     };
 
-    var reversedStrings = _.invoke(['dog', 'cat'], reverse);
+    var reversedStrings = _.invoke(['dog', 'cat', 'fish'], reverse);
 
-    expect(reversedStrings).to.eql(['god', 'tac']);
+    expect(reversedStrings).to.eql(['god', 'tac', 'hsif']);
   });
 });
 
@@ -394,7 +394,7 @@ describe('defaults', function() {
     expect(defaulted).to.equal(to);
   });
 
-  it('should copy a property if that key is already set on the target', function() {
+  it('should copy a property if that key is not already set on the target', function() {
     var to = {};
     var from = {a:1};
     var defaulted = _.defaults(to, from);
